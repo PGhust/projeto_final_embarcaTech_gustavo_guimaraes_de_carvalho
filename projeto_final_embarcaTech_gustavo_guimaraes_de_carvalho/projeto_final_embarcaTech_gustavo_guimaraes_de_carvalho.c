@@ -89,3 +89,24 @@ void npWrite(){
 //Inicializando o programa principal 
 //Main ira demarcar o que será feito na execução do prograa, importante se atentar que tal qual o exemplo inicialiamos os recursos da matriz de LEDs pela funçõa nplinit e limpamos o buffer com npClear
 
+int main(){
+    //inicializa I/O
+    stdio_init_all();
+
+    //Inicializa matriz de LED's NeoPixel
+    npInit(LED_PIN);
+    npClear();
+
+    //Aqui podemos alterar a imagem desejada a ser demonstrada na matriz!
+    //Como se estivesse desenhando nos LED's
+    npSetLED(0, 255, 0, 0); //LED índice 0 para vermelho
+    npSetLED(12, 0, 255, 0); // LED 12 (central) para verde
+
+    //Acabamos de modificar os buffers certo? Escrevemos esses dados nos LED's, agora não fazemos mais nada!
+    npWrite(); //Escreve os dados nos LED's
+
+    //Entra em loop infinito (não faz mais nada)~
+    while (true){
+        sleep_ms(1000);
+    }
+}
