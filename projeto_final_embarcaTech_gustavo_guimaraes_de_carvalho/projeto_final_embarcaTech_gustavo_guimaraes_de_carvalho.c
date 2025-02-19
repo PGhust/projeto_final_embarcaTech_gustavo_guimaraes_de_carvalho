@@ -33,3 +33,18 @@ uint sm;
 /**
  * Inicialize a máquina PIO para controle da matriz de LED's
  */
+
+ void npInit(uint pin){
+    //Criando programa PIO --> a função cria o PIO prog configurado no ws2818b.pio e registra a unidade de PIO na variável np_pio
+    uint offset = pio_add_program(pio0, &ws2818b_program);
+    np_io = pio0;
+ }
+
+//Agora é necessário tomar posse de um máquina PIO --> Se nenhuma máquina estiver livre o programa dá erro e para.
+//Tomada de posse de uma máquina PIO 
+sm = pio_claim_unsed_sm(n_pio, false);
+if (sm < 0){
+    np_pio = pio1;
+    sm = pio_claim_unsed_sm(np_pio, true); //Caso em que nenhuma máquina está livre, pare! 
+}
+
