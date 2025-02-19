@@ -38,7 +38,7 @@ uint sm;
     //Criando programa PIO --> a função cria o PIO prog configurado no ws2818b.pio e registra a unidade de PIO na variável np_pio
     uint offset = pio_add_program(pio0, &ws2818b_program);
     np_io = pio0;
- }
+ 
 
 //Agora é necessário tomar posse de um máquina PIO --> Se nenhuma máquina estiver livre o programa dá erro e para.
 //Tomada de posse de uma máquina PIO 
@@ -47,4 +47,45 @@ if (sm < 0){
     np_pio = pio1;
     sm = pio_claim_unsed_sm(np_pio, true); //Caso em que nenhuma máquina está livre, pare! 
 }
+
+//Inicializa o programa na máquina PIO obtida.
+ws2818b_program_init(np_pio, sm, offset, pin, 800000.f);
+
+//Limpamos o buffer de pixels dos LED's
+for (uint i = 0; i < LED_COUNT; ++i){
+    leds[i].R = 0;
+    leds[i].G = 0;
+    leds[i].B = 0;
+}
+}
+
+//Criação da função npSetLED --> Muda a cor do LED do índice selecionado (alterando o valor dos buffers)
+
+//Vamos atribuir uma cor RGB a um LED 
+void npSetLED(const uint index, const uint8_t r, const uint8_t g, const uint8_t b){
+
+    leds[index].R = r;
+    leds[index].G = g;
+    leds[index].B = b;
+
+}
+
+//Void de limpeza do buffer de pixels 
+void npClear(){
+    for(uint i = 0; i < LED_COUNT; i++)
+    npSetLED(i, 0, 0, 0);
+}
+
+//Função de escrita de dados do buffer para os LED's --> envia os dados do buffer p/ o LED utilizando o sistema PIO escrevendo um byte por vez através na ordem GRB 
+void npWrite(){
+    //Escreve cada dado de 8-bits dos pixels em sequência no buffer da máquina PIO
+    for(uint i = 0; i < LED_COUNT; i++){
+        pio_sm_put_blocking(np_pio, sm, leds[i].G);
+        pio_sm_put_blocking(np_pio, sm, leds[i].R);
+        pio_sm_put_blocking(np_pio, sm, leds[i].B);
+    }
+}
+
+//Inicializando o programa principal 
+//Main ira demarcar o que será feito na execução do prograa, importante se atentar que tal qual o exemplo inicialiamos os recursos da matriz de LEDs pela funçõa nplinit e limpamos o buffer com npClear
 
